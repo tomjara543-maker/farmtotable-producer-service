@@ -1,0 +1,48 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CertificationType {
+  ORGANIC
+  FAIR_TRADE
+  DESIGNATION_OF_ORIGIN
+}
+
+model Producer {
+  id             String          @id @default(uuid())
+  ownerId        String          @map("owner_id")
+  farmName       String          @map("farm_name")
+  locationLat    Float           @map("location_lat")
+  locationLng    Float           @map("location_lng")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  certifications Certification[]
+
+  @@index([ownerId])
+  @@map("producers")
+}
+
+model Certification {
+  id         String            @id @default(uuid())
+  producerId String            @map("producer_id")
+  producer   Producer          @relation(fields: [producerId], references: [id], onDelete: Cascade)
+  type       CertificationType
+  validUntil String            @map("valid_until") // YYYY-MM-DD
+
+  @@unique([producerId, type])
+  @@map("certifications")
+}
+
+// Consumidor idempotente de eventos (ver src/db.ts)
+model ProcessedEvent {
+  eventId     String   @id @map("event_id")
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@map("processed_events")
+}
