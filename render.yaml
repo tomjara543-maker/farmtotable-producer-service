@@ -4,6 +4,7 @@ services:
     runtime: docker
     region: virginia
     plan: free
+    autoDeploy: false
     healthCheckPath: /health
     envVars:
       - key: SERVICE_NAME

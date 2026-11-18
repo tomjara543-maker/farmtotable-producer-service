@@ -7,18 +7,18 @@ import { HttpError, notFound } from "./http";
 
 const include = { certifications: { select: { type: true, validUntil: true } } } as const;
 
-const createSchema = z.object({
+export const createSchema = z.object({
   farmName: z.string().trim().min(1, "El nombre de la granja es obligatorio"),
   locationLat: z.coerce.number().min(-90).max(90),
   locationLng: z.coerce.number().min(-180).max(180),
 });
 
-const certificationSchema = z.object({
+export const certificationSchema = z.object({
   type: z.enum(["ORGANIC", "FAIR_TRADE", "DESIGNATION_OF_ORIGIN"], "Tipo de certificación inválido"),
   validUntil: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "validUntil debe ser una fecha YYYY-MM-DD"),
 });
 
-const toJson = ({ createdAt: _c, ...p }: { createdAt: Date } & Record<string, unknown>) => p;
+export const toJson = ({ createdAt: _c, ...p }: { createdAt: Date } & Record<string, unknown>) => p;
 
 export function producerRoutes() {
   const router = Router();
